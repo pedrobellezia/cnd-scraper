@@ -76,6 +76,9 @@ Campos configuráveis no `.env`:
 | `ALLOWED_ORIGINS`         | Origens permitidas pelo CORS (separadas por vírgula).                      | `http://localhost:3000`                      |
 | `HOST`                    | IP ou host onde a aplicação escutará.                                      | `0.0.0.0`                                    |
 | `PORT`                    | Porta à ser exposta pela API.                                              | `5049`                                       |
+| `VNC_PASSWORD`            | Senha para proteger o acesso ao servidor VNC interno do container.          | `sua_senha_vnc`                              |
+| `VNC_PORT`                | Porta do host mapeada para a porta do servidor VNC do container.           | `5900`                                       |
+
 
 > [!NOTE]
 > Todas as rotas são testadas utilizando `HEADLESS=False`. A execução com `HEADLESS=True` pode falhar em algumas certidões devido a mecanismos de detecção de bots.
@@ -115,6 +118,18 @@ Campos configuráveis no `.env`:
    ```bash
    docker compose up --build -d
    ```
+
+### VNC
+
+O container está configurado com um servidor VNC para que você possa acompanhar a execução da aplicação em tempo real.
+
+1. **Visualização**:
+   - Utilize um cliente VNC (como [Remmina](https://github.com/freerdp/remmina), [TigerVNC](https://github.com/TigerVNC/tigervnc) ou [UltraVNC](https://github.com/ultravnc/ultravnc)) para se conectar no endereço:
+     ```
+     {HOST}:{VNC_PORT}
+     ```
+   - Forneça a senha configurada em `VNC_PASSWORD` (se houver).
+
 
 ---
 

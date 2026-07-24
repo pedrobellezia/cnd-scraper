@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/playwright/python:v1.60.0-noble
 
-RUN apt-get update && apt-get install -y xvfb && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y xvfb x11vnc tini && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -10,11 +10,14 @@ COPY pyproject.toml uv.lock ./
 
 RUN uv sync --frozen --no-install-project
 
-COPY app/ ./app/
+ENTRYPOINT ["/usr/bin/tini", "--"]
 
-EXPOSE 5049
+COPY app/ ./app/
+COPY ./scripts/docker_init.sh ./
+RUN chmod +x docker_init.sh
+
+EXPOSE 5049 5900
 
 ENV PATH="/app/.venv/bin:$PATH"
 
-CMD xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' \
-    sh -c 'uvicorn app.app:app --host "$HOST" --port "$PORT"'
+CMD ["./docker_init.sh"]
