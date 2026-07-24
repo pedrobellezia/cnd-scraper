@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/playwright/python:v1.60.0-noble
 
-RUN apt-get update && apt-get install -y xvfb && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y xvfb x11vnc tini && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -9,6 +9,8 @@ RUN pip install --no-cache-dir uv
 COPY pyproject.toml uv.lock ./
 
 RUN uv sync --frozen --no-install-project
+
+ENTRYPOINT ["/usr/bin/tini", "--"]
 
 COPY app/ ./app/
 COPY ./scripts/docker_init.sh ./
