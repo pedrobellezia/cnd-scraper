@@ -11,10 +11,11 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-install-project
 
 COPY app/ ./app/
+COPY ./scripts/docker_init.sh ./
+RUN chmod +x docker_init.sh
 
-EXPOSE 5049
+EXPOSE 5049 5900
 
 ENV PATH="/app/.venv/bin:$PATH"
 
-CMD xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' \
-    sh -c 'uvicorn app.app:app --host "$HOST" --port "$PORT"'
+CMD ["./docker_init.sh"]
