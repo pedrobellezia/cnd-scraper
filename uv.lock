@@ -167,7 +167,7 @@ wheels = [
 ]
 
 [[package]]
-name = "cnd-scrapper"
+name = "cnd-scraper"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

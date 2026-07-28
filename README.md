@@ -1,6 +1,6 @@
-# CND Scrapper
+# CND Scraper
 
-O **CND Scrapper** é uma API de scraping desenvolvida com FastAPI e Playwright para realizar o download de diversas Certidões Negativas de Débitos.
+O **CND Scraper** é uma API de scraping desenvolvida com FastAPI e Playwright para realizar o download de diversas Certidões Negativas de Débitos.
 
 ---
 
@@ -42,9 +42,9 @@ O **CND Scrapper** é uma API de scraping desenvolvida com FastAPI e Playwright 
 
 Caso precise de uma CND que ainda não esteja implementada, você pode abrir uma issue utilizando os links abaixo:
 
-* [Solicitar Nova CND Estadual](https://github.com/pedrobellezia/cnd-scrapper/issues/new?template=cnd_estadual.yml)
-* [Solicitar Nova CND Municipal](https://github.com/pedrobellezia/cnd-scrapper/issues/new?template=cnd_municipal.yml)
-* [Solicitar Outros Tipos de CND](https://github.com/pedrobellezia/cnd-scrapper/issues/new?template=cnd_outras.yml)
+* [Solicitar Nova CND Estadual](https://github.com/pedrobellezia/cnd-scraper/issues/new?template=cnd_estadual.yml)
+* [Solicitar Nova CND Municipal](https://github.com/pedrobellezia/cnd-scraper/issues/new?template=cnd_municipal.yml)
+* [Solicitar Outros Tipos de CND](https://github.com/pedrobellezia/cnd-scraper/issues/new?template=cnd_outras.yml)
 
 ---
 
