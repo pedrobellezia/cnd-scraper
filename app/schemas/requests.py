@@ -26,7 +26,6 @@ def normalize_municipio(municipio: str) -> str:
 
 class BaseCndRequest(BaseModel):
     model_config = ConfigDict(
-        extra="forbid",
         str_strip_whitespace=True,
     )
 
