@@ -200,7 +200,7 @@ class Estadual:
                 """
         )
 
-        async with page.expect_download(timeout=30_000) as download_info:
+        async with page.expect_download(timeout=60_000) as download_info:
             await page.locator("#btnEnviar").click()
 
         download = await download_info.value

@@ -97,7 +97,7 @@ class CaptchaSolver:
 
     async def solve_normal(self, img_xpath, input_xpath):
         img_locator = self.page.locator(img_xpath)
-        await img_locator.first.wait_for(timeout=30_000)
+        await img_locator.first.wait_for(timeout=60_000)
         img_count = await img_locator.count()
         if img_count == 0:
             logger.error(

@@ -13,7 +13,7 @@ class Fgts:
         await page.goto(
             "https://consulta-crf.caixa.gov.br/consultacrf/pages/consultaEmpregador.jsf",
             wait_until="domcontentloaded",
-            timeout=30_000,
+            timeout=60_000,
         )
 
         await page.locator("//input[@id='mainForm:txtInscricao1']").fill(cnpj)

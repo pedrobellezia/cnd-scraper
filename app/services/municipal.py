@@ -49,7 +49,7 @@ class Municipal:
         await page.goto(
             "https://e-gov.betha.com.br/cdweb/",
             wait_until="domcontentloaded",
-            timeout=30_000,
+            timeout=60_000,
         )
         await page.locator("//select[@id='mainForm:estados']").select_option(estado_id)
         await page.locator("//select[@id='mainForm:municipios']").select_option(
@@ -75,7 +75,7 @@ class Municipal:
             "//*[@id='mainForm:t-contribuinte']/tbody/tr/td[3]/img"
         ).click()
 
-        async with page.expect_download(timeout=30_000) as dl:
+        async with page.expect_download(timeout=60_000) as dl:
             await (
                 page.frame_locator("//iframe[@class='fancybox-iframe']")
                 .locator("//*[@id='download']")
@@ -90,7 +90,7 @@ class Municipal:
         await page.goto(
             "https://www.blumenau.sc.gov.br/cidadao/pages/siatu/cnd/EmissaoCND.aspx",
             wait_until="domcontentloaded",
-            timeout=30_000,
+            timeout=60_000,
         )
         await page.locator(
             "//*[@name='ctl00$ContentBody$cbkEmissaoCND$txtCpfCnpj']"
@@ -115,7 +115,7 @@ class Municipal:
 
         await asyncio.sleep(5)
 
-        async with page.expect_download(timeout=30_000) as dl:
+        async with page.expect_download(timeout=60_000) as dl:
             await page.locator("//*[@id='ctl00_ContentBody_btnImprimir']").click()
         download = await dl.value
 
@@ -228,7 +228,7 @@ class Municipal:
         await page.goto(
             "https://itapema-sc.prefeituramoderna.com.br/meuiptu/index.php",
             wait_until="domcontentloaded",
-            timeout=30_000,
+            timeout=60_000,
         )
 
         await asyncio.sleep(0.5)
@@ -259,7 +259,7 @@ class Municipal:
         await page.goto(
             "https://cidadao.bc.sc.gov.br/cidadao/balneario_camboriu/portal/servicos/certidoes/emissao?params=MTU%3D",
             wait_until="domcontentloaded",
-            timeout=30_000,
+            timeout=60_000,
         )
 
         await page.locator("//select[@formcontrolname='idFinalidade']").select_option(
@@ -270,7 +270,7 @@ class Municipal:
 
         await page.locator("//cidadao-button[@type='submit']").click()
 
-        async with page.expect_download(timeout=30_000) as dl:
+        async with page.expect_download(timeout=60_000) as dl:
             await page.locator("//cidadao-button[@icon='fa fa-download']").click()
         download = await dl.value
 
@@ -293,7 +293,7 @@ class Municipal:
         await page.goto(
             "https://cidadao.joinville.sc.gov.br/cidadao/joinville/portal/servicos/certidoes/emissao?params=MTU%3D",
             wait_until="domcontentloaded",
-            timeout=30_000,
+            timeout=60_000,
         )
 
         solver = CaptchaSolver(api_key=CAPTCHA_API_KEY, page=page)
@@ -396,7 +396,7 @@ class Municipal:
                 error_type=ErrorType.CaptchaError,
             )
 
-        async with page.expect_download(timeout=30_000) as dl:
+        async with page.expect_download(timeout=60_000) as dl:
             await page.click('//*[@id="jar"]')
 
         download = await dl.value
@@ -420,7 +420,7 @@ class Municipal:
         await page.goto(
             "https://icara-sc.prefeituramoderna.com.br/meuiptu/index.php",
             wait_until="domcontentloaded",
-            timeout=30_000,
+            timeout=60_000,
         )
 
         await asyncio.sleep(1)

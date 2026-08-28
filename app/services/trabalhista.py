@@ -15,7 +15,7 @@ class Trabalhista:
         await page.goto(
             "https://cndt-certidao.tst.jus.br/inicio.faces",
             wait_until="domcontentloaded",
-            timeout=30_000,
+            timeout=60_000,
         )
 
         await page.locator("//*[@id='corpo']/div/div[2]/input[1]").click()
@@ -35,7 +35,7 @@ class Trabalhista:
                 error_type=ErrorType.CaptchaError,
             )
 
-        async with page.expect_download(timeout=30_000) as download_info:
+        async with page.expect_download(timeout=60_000) as download_info:
             await page.locator("//*[@id='gerarCertidaoForm:btnEmitirCertidao']").click()
         download = await download_info.value
 
