@@ -246,17 +246,19 @@ Você deve informar o `error_type` apropriado. Os tipos são:
 * `TimeoutError` (Retorna HTTP 504): Levantado automaticamente se operações do Playwright estourarem o tempo limite.
 * `DownloadError` (Retorna HTTP 502): Erro no download do PDF do documento emitido.
 * `ScrapError` (Retorna HTTP 500): Falha interna genérica.
-* `CndUnavailable` (Retorna HTTP 422): Use quando a consulta foi bem sucedida, mas o órgão não emite o documento devido à débitos pendentes da empresa.
  
 ### Exemplo prático:
 ```python
 from app.exceptions import ScrapError, ErrorType
 
-if await page.locator("//div[@id='mensagens-erro']").is_visible():
-    raise ScrapError(
-        message="A certidão não pôde ser emitida pois constam débitos de tributos estaduais.",
-        error_type=ErrorType.CndUnavailable
-    )
+...
+
+    download_path = await self.download_pdf(page)
+    if not download_path:
+        raise ScrapError(
+            message=f"Falha ao obter PDF para {cnpj}",
+            error_type=ErrorType.DownloadError,
+        )
 ```
 
 ---

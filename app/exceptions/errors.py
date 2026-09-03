@@ -9,7 +9,6 @@ class ErrorType(Enum):
     DownloadError = "DownloadError"
     ScrapError = "ScrapError"
     CaptchaError = "CaptchaError"
-    CndUnavailable = "CndUnavailable"
 
 
 class AppBaseError(Exception):
@@ -35,7 +34,6 @@ class AppBaseError(Exception):
             ErrorType.TimeoutError: 504,  # Gateway Timeout
             ErrorType.DownloadError: 502,  # Bad Gateway
             ErrorType.CaptchaError: 502,  # Bad Gateway
-            ErrorType.CndUnavailable: 422,  # Unprocessable Entity
             ErrorType.ScrapError: 500,  # Internal Server Error
         }
         self.status_code = status_mapping.get(self.error_type, 500)

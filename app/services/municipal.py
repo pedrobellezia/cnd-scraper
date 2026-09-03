@@ -464,10 +464,9 @@ class Municipal:
             await page.locator(
                 "//span[@id='ctl00_conteudo_lblMensagemExcluir']"
             ).wait_for(timeout=3000)
-            raise ScrapError(
-                message="Não foi possível emitir a certidão porque constam débitos pendentes.",
-                error_type=ErrorType.CndUnavailable,
-            )
+            await page.emulate_media(media="print")
+            logger.info("Municipal ES/Vitoria scrape completed for CNPJ: %s", cnpj)
+            return page.pdf()
         except PlaywrightTimeout:
             pass
 

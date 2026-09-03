@@ -54,20 +54,19 @@ class Estadual:
         await asyncio.sleep(5)
 
         if await page.locator("//*[@class='bg-danger']").is_visible():
-            raise ScrapError(
-                message="Não foi possível emitir a certidão porque constam débitos pendentes.",
-                error_type=ErrorType.CndUnavailable,
-            )
+            await page.emulate_media(media="print")
+            pdf_bytes = await page.pdf
 
-        async with page.expect_download(timeout=30000) as dl:
-            await page.locator("//*[@id='MainContent_btnImpressao']").click()
-        download = await dl.value
-        download_path = await download.path()
-        if not download_path:
-            raise ScrapError(
-                message="Falha ao baixar a CND", error_type=ErrorType.DownloadError
-            )
-        pdf_bytes = Path(download_path).read_bytes()
+        else:
+            async with page.expect_download(timeout=30000) as dl:
+                await page.locator("//*[@id='MainContent_btnImpressao']").click()
+            download = await dl.value
+            download_path = await download.path()
+            if not download_path:
+                raise ScrapError(
+                    message="Falha ao baixar a CND", error_type=ErrorType.DownloadError
+                )
+            pdf_bytes = Path(download_path).read_bytes()
 
         logger.info("Estadual SP scrape completed for CNPJ: %s", cnpj)
         return pdf_bytes
