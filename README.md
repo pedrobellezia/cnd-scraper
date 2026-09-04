@@ -76,6 +76,7 @@ Campos configuráveis no `.env`:
 | `ALLOWED_ORIGINS`         | Origens permitidas pelo CORS (separadas por vírgula).                      | `http://localhost:3000`                      |
 | `HOST`                    | IP ou host onde a aplicação escutará.                                      | `0.0.0.0`                                    |
 | `PORT`                    | Porta à ser exposta pela API.                                              | `5049`                                       |
+| `PAGE_TIMEOUT`            | Timeout global (em ms) para as ações do Playwright.                        | `30000`                                      |
 | `VNC_PASSWORD`            | Senha para proteger o acesso ao servidor VNC interno do container.          | `sua_senha_vnc`                              |
 | `VNC_PORT`                | Porta do host mapeada para a porta do servidor VNC do container.           | `5900`                                       |
 
@@ -281,6 +282,6 @@ http://{HOST}:{PORT}/screenshot/{nome_do_arquivo_de_erro}.png
 
 ## Desenvolvimento e Arquitetura
 
-* **[Estrutura e Arquitetura Geral](docs/README.md)**
+* **[Estrutura e Arquitetura Geral](docs/ARCHITECTURE.md)**
 * **[Guia Prático de Desenvolvimento](docs/DESENVOLVIMENTO.md)**
 
