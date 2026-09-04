@@ -269,7 +269,6 @@ Erros que ocorrem durante um scraping.
 |    **504 Gateway Timeout**    | `TimeoutError`         | Uma ação (carregamento, cliques, etc.) ultrapassou o tempo limite configurado.                 |
 |      **502 Bad Gateway**      | `DownloadError`        | A certidão foi gerada com sucesso, mas a tentativa de download do arquivo PDF falhou.          |
 |      **502 Bad Gateway**      | `CaptchaError`         | Falha na resolução do CAPTCHA.                                                                 |
-| **422 Unprocessable Entity**  | `CndUnavailable`       | O portal não disponibilizou a emissão da certidão para o contribuinte por conta de pendências. |
 | **500 Internal Server Error** | `ScrapError`           | Qualquer erro inesperado.                                                                      |
 
 ### Captura de Tela de Erros

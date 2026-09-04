@@ -1,3 +1,5 @@
+import time
+
 from playwright.async_api import (
     Page,
     BrowserContext,
@@ -52,20 +54,19 @@ class Estadual:
         await asyncio.sleep(5)
 
         if await page.locator("//*[@class='bg-danger']").is_visible():
-            raise ScrapError(
-                message="Não foi possível emitir a certidão porque constam débitos pendentes.",
-                error_type=ErrorType.CndUnavailable,
-            )
+            await page.emulate_media(media="print")
+            pdf_bytes = await page.pdf()
 
-        async with page.expect_download(timeout=30000) as dl:
-            await page.locator("//*[@id='MainContent_btnImpressao']").click()
-        download = await dl.value
-        download_path = await download.path()
-        if not download_path:
-            raise ScrapError(
-                message="Falha ao baixar a CND", error_type=ErrorType.DownloadError
-            )
-        pdf_bytes = Path(download_path).read_bytes()
+        else:
+            async with page.expect_download(timeout=30000) as dl:
+                await page.locator("//*[@id='MainContent_btnImpressao']").click()
+            download = await dl.value
+            download_path = await download.path()
+            if not download_path:
+                raise ScrapError(
+                    message="Falha ao baixar a CND", error_type=ErrorType.DownloadError
+                )
+            pdf_bytes = Path(download_path).read_bytes()
 
         logger.info("Estadual SP scrape completed for CNPJ: %s", cnpj)
         return pdf_bytes
@@ -91,44 +92,31 @@ class Estadual:
                 error_type=ErrorType.CaptchaError,
             )
 
+        time.sleep(10)
+
+        # Pode ser que gere algum download mas é bem raro entao se der erro so executar denovo que vai dar certo
         await page.locator(
             "//a[.//span[contains(normalize-space(), 'Buscar')]]"
         ).click()
 
-        try:
-            download_task = asyncio.create_task(page.wait_for_event("download"))
-            popup_task = asyncio.create_task(page.wait_for_event("popup"))
 
-            await page.click('//*[@id="Body_Main_Main_ctnResultado_btnGerarCnd"]')
+        async with page.expect_popup(timeout=30000) as popup:
+            try:
+                async with page.expect_download(timeout=15000) as dl:
+                    await page.click('//*[@id="Body_Main_Main_ctnResultado_btnGerarCnd"]')
+                    download = await dl.value
+                    download_path = await download.path()
+                    if not download_path:
+                        raise ScrapError(
+                            message="Falha ao baixar a CND", error_type=ErrorType.DownloadError
+                        )
+                    pdf_bytes = Path(download_path).read_bytes()
 
-            done, _ = await asyncio.wait(
-                [download_task, popup_task], return_when=asyncio.FIRST_COMPLETED
-            )
+            except PlaywrightTimeout:
+                pp = await popup.value
+                await pp.emulate_media(media="print")
+                pdf_bytes = await pp.pdf()
 
-            if download_task in done:
-                download: Download = await download_task
-                popup_task.cancel()
-
-            else:
-                popup: Page = await popup_task
-                download_task.cancel()
-                await popup.emulate_media(media="print")
-                return await popup.pdf()
-
-        except PlaywrightTimeout:
-            link = page.locator('//ul[@class="sat-vs-success"]/li[3]/a')
-
-            async with page.expect_download(timeout=30000) as dl:
-                await link.click()
-
-            download = await dl.value
-
-        download_path = await download.path()
-        if not download_path:
-            raise ScrapError(
-                message="Falha ao baixar a CND", error_type=ErrorType.DownloadError
-            )
-        pdf_bytes = Path(download_path).read_bytes()
 
         logger.info("Estadual SC scrape completed for CNPJ: %s", cnpj)
 
@@ -200,7 +188,7 @@ class Estadual:
                 """
         )
 
-        async with page.expect_download(timeout=30_000) as download_info:
+        async with page.expect_download(timeout=60_000) as download_info:
             await page.locator("#btnEnviar").click()
 
         download = await download_info.value

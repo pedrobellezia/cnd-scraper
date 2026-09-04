@@ -39,7 +39,7 @@ class CaptchaSolver:
 
         return key_list
 
-    async def auto_solve_v2(self) -> dict:
+    async def get_v2_token(self) -> dict:
         key_list = await self.v2_sitekey()
 
         if not key_list:
@@ -63,12 +63,13 @@ class CaptchaSolver:
         try:
             result = await self.solver.recaptcha(sitekey=sitekey, url=self.page.url)
             token = result["code"]
+            logger.info("[CaptchaSolver] Token recebido com sucesso %s...)", token[:4])
+            return {"success": True, "token": token}
         except Exception:
             logger.exception("[CaptchaSolver] Erro ao resolver CAPTCHA")
             return {"success": False, "error": "Falha ao resolver CAPTCHA"}
 
-        logger.info("[CaptchaSolver] Token recebido com sucesso %s...)", token[:4])
-
+    async def fill_v2_response(self, token: str) -> str:
         textarea_locator = self.page.locator("//textarea[@id='g-recaptcha-response']")
         count = await textarea_locator.count()
 
@@ -88,9 +89,15 @@ class CaptchaSolver:
 
         return {"success": True, "token": token}
 
+    async def auto_solve_v2(self) -> dict:
+        data = await self.get_v2_token()
+        if not data.get("success"):
+            return data
+        return await self.fill_v2_response(token=data.get("token"))
+
     async def solve_normal(self, img_xpath, input_xpath):
         img_locator = self.page.locator(img_xpath)
-        await img_locator.first.wait_for(timeout=30_000)
+        await img_locator.first.wait_for(timeout=60_000)
         img_count = await img_locator.count()
         if img_count == 0:
             logger.error(

@@ -49,7 +49,7 @@ class Municipal:
         await page.goto(
             "https://e-gov.betha.com.br/cdweb/",
             wait_until="domcontentloaded",
-            timeout=30_000,
+            timeout=60_000,
         )
         await page.locator("//select[@id='mainForm:estados']").select_option(estado_id)
         await page.locator("//select[@id='mainForm:municipios']").select_option(
@@ -75,7 +75,7 @@ class Municipal:
             "//*[@id='mainForm:t-contribuinte']/tbody/tr/td[3]/img"
         ).click()
 
-        async with page.expect_download(timeout=30_000) as dl:
+        async with page.expect_download(timeout=60_000) as dl:
             await (
                 page.frame_locator("//iframe[@class='fancybox-iframe']")
                 .locator("//*[@id='download']")
@@ -90,7 +90,7 @@ class Municipal:
         await page.goto(
             "https://www.blumenau.sc.gov.br/cidadao/pages/siatu/cnd/EmissaoCND.aspx",
             wait_until="domcontentloaded",
-            timeout=30_000,
+            timeout=60_000,
         )
         await page.locator(
             "//*[@name='ctl00$ContentBody$cbkEmissaoCND$txtCpfCnpj']"
@@ -115,7 +115,7 @@ class Municipal:
 
         await asyncio.sleep(5)
 
-        async with page.expect_download(timeout=30_000) as dl:
+        async with page.expect_download(timeout=60_000) as dl:
             await page.locator("//*[@id='ctl00_ContentBody_btnImprimir']").click()
         download = await dl.value
 
@@ -228,7 +228,7 @@ class Municipal:
         await page.goto(
             "https://itapema-sc.prefeituramoderna.com.br/meuiptu/index.php",
             wait_until="domcontentloaded",
-            timeout=30_000,
+            timeout=60_000,
         )
 
         await asyncio.sleep(0.5)
@@ -259,7 +259,7 @@ class Municipal:
         await page.goto(
             "https://cidadao.bc.sc.gov.br/cidadao/balneario_camboriu/portal/servicos/certidoes/emissao?params=MTU%3D",
             wait_until="domcontentloaded",
-            timeout=30_000,
+            timeout=60_000,
         )
 
         await page.locator("//select[@formcontrolname='idFinalidade']").select_option(
@@ -270,7 +270,7 @@ class Municipal:
 
         await page.locator("//cidadao-button[@type='submit']").click()
 
-        async with page.expect_download(timeout=30_000) as dl:
+        async with page.expect_download(timeout=60_000) as dl:
             await page.locator("//cidadao-button[@icon='fa fa-download']").click()
         download = await dl.value
 
@@ -290,31 +290,58 @@ class Municipal:
     async def sc_joinville(page: Page, _: BrowserContext, cnpj: str) -> bytes:
         logger.info("Starting Municipal SC/Joinville scrape for CNPJ: %s", cnpj)
 
-        await page.goto("https://tmiweb.joinville.sc.gov.br/sefaz/jsp/cnd/index.jsp")
+        await page.goto(
+            "https://cidadao.joinville.sc.gov.br/cidadao/joinville/portal/servicos/certidoes/emissao?params=MTU%3D",
+            wait_until="domcontentloaded",
+            timeout=60_000,
+        )
 
-        await page.locator("//select[@id='finalidade']").select_option(value="6")
+        solver = CaptchaSolver(api_key=CAPTCHA_API_KEY, page=page)
 
-        await page.locator("//input[@name='cnpj']").fill(cnpj)
+        result = await solver.get_v2_token()
 
-        await page.locator("//input[@value='Pesquisar']").click()
+        if not result.get("success", False):
+            raise ScrapError(
+                message=result.get("error") or "Erro ao resolver CAPTCHA",
+                error_type=ErrorType.CaptchaError,
+            )
 
-        await page.locator("//select[@id='ctp_codigo']").select_option(value="8")
+        emissao_request = {
+            "data": {
+                "idFinalidade": 11,
+                "cpfCnpj": cnpj,
+                "captcha": result.get("token"),
+                "idServico": 15,
+            },
+            "url": "https://cidadao.joinville.sc.gov.br/cidadao/api/joinville/v1/certidoes/emissao",
+        }
 
-        old_url = page.url
-
-        await page.locator("//input[contains(@value, 'Gerar cert')]").click()
-
-        await page.wait_for_url(lambda current_url: current_url != old_url)
-
-        url = page.url
-
-        response = await page.context.request.get(url)
+        response = await page.request.post(**emissao_request)
         if not response.ok:
+            raise ScrapError(
+                message="Erro ao tentar emitir a CND",
+                error_type=ErrorType.DownloadError,
+            )
+
+        emissao_data = await response.json()
+        # O comportamento da api do sistema de joinville ainda não foi mapeado,
+        # vou deixar esse log até confirmar a melhor forma de tratar os dados enviados pelo sistema
+        logger.debug("[Joinville] Resposta da emissao: %s", emissao_data)
+
+        pdf_url = emissao_data[0].get("url")
+        if not pdf_url:
+            raise ScrapError(
+                message="Erro ao tentar emitir a CND",
+                error_type=ErrorType.DownloadError,
+            )
+
+        response_cnd = await page.request.get(pdf_url)
+        if not response_cnd.ok:
             raise ScrapError(
                 message="Falha ao baixar a CND", error_type=ErrorType.DownloadError
             )
 
-        pdf_bytes = await response.body()
+        pdf_bytes = await response_cnd.body()
 
         logger.info("Municipal SC/Joinville scrape completed for CNPJ: %s", cnpj)
 
@@ -369,7 +396,7 @@ class Municipal:
                 error_type=ErrorType.CaptchaError,
             )
 
-        async with page.expect_download(timeout=30_000) as dl:
+        async with page.expect_download(timeout=60_000) as dl:
             await page.click('//*[@id="jar"]')
 
         download = await dl.value
@@ -393,7 +420,7 @@ class Municipal:
         await page.goto(
             "https://icara-sc.prefeituramoderna.com.br/meuiptu/index.php",
             wait_until="domcontentloaded",
-            timeout=30_000,
+            timeout=60_000,
         )
 
         await asyncio.sleep(1)
@@ -437,10 +464,9 @@ class Municipal:
             await page.locator(
                 "//span[@id='ctl00_conteudo_lblMensagemExcluir']"
             ).wait_for(timeout=3000)
-            raise ScrapError(
-                message="Não foi possível emitir a certidão porque constam débitos pendentes.",
-                error_type=ErrorType.CndUnavailable,
-            )
+            await page.emulate_media(media="print")
+            logger.info("Municipal ES/Vitoria scrape completed for CNPJ: %s", cnpj)
+            return await page.pdf()
         except PlaywrightTimeout:
             pass
 
