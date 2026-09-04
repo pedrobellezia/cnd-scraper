@@ -466,7 +466,7 @@ class Municipal:
             ).wait_for(timeout=3000)
             await page.emulate_media(media="print")
             logger.info("Municipal ES/Vitoria scrape completed for CNPJ: %s", cnpj)
-            return page.pdf()
+            return await page.pdf()
         except PlaywrightTimeout:
             pass
 

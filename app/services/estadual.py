@@ -55,7 +55,7 @@ class Estadual:
 
         if await page.locator("//*[@class='bg-danger']").is_visible():
             await page.emulate_media(media="print")
-            pdf_bytes = await page.pdf
+            pdf_bytes = await page.pdf()
 
         else:
             async with page.expect_download(timeout=30000) as dl:
